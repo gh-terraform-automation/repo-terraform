@@ -1,14 +1,16 @@
 name: Add and configure GitHub repository
 
 on:
-  workflow_call:
-    inputs:
-      NEW_REPO_NAME:
-        type: string
-        required: true
-    secrets:
-      GH_PRIVATE_TOKEN:
-        required: true
+  # workflow_call:
+  #   inputs:
+  #     NEW_REPO_NAME:
+  #       type: string
+  #       required: true
+  #   secrets:
+  #     GH_PRIVATE_TOKEN:
+  #       required: true
+  repository_dispatch:
+    types: [conf-repo]
 
 jobs:
   workflow:
@@ -19,6 +21,7 @@ jobs:
       - name: Update Terraform repositories list
         run: |
           # Check if file exists
+          NEW_REPO_NAME=${{github.event.client_payload.new_repo_name}}
           TFVARS_FILE="repositories.auto.tfvars"
           
           if [[ ! -f "$TFVARS_FILE" ]]; then
