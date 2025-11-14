@@ -22,7 +22,7 @@ jobs:
         run: |
           # Check if file exists
           echo "${{github.event.client_payload.new_repo_name}}"
-          NEW_REPO_NAME=$(echo ${{github.event.client_payload.new_repo_name}} | sed s/"tf-7ofWMvL9xWxxT8VsCQrU"//)
+          NEW_REPO_NAME=$(echo "${{ github.event.client_payload.new_repo_name }}" | sed 's|.*/||')
           TFVARS_FILE="repositories.auto.tfvars"
           
           if [[ ! -f "$TFVARS_FILE" ]]; then
