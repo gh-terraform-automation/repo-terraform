@@ -21,6 +21,7 @@ jobs:
       - name: Update Terraform repositories list
         run: |
           # Check if file exists
+          echo "${{github.event.client_payload.new_repo_name}}"
           NEW_REPO_NAME=${{github.event.client_payload.new_repo_name}}
           TFVARS_FILE="repositories.auto.tfvars"
           
