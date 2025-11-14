@@ -10,7 +10,8 @@ on:
   #     GH_PRIVATE_TOKEN:
   #       required: true
   repository_dispatch:
-    types: [conf-repo]
+    types:
+      - setup-repo-${{github.event.client_payload.new_repo_name}}
 
 jobs:
   workflow:
