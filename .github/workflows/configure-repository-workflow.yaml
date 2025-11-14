@@ -11,7 +11,7 @@ on:
   #       required: true
   repository_dispatch:
     types:
-      - setup-repo-${{github.event.client_payload.new_repo_name}}
+      - setup-repo
 
 jobs:
   workflow:
