@@ -22,7 +22,7 @@ jobs:
         run: |
           # Check if file exists
           echo "${{github.event.client_payload.new_repo_name}}"
-          NEW_REPO_NAME=${{github.event.client_payload.new_repo_name}}
+          NEW_REPO_NAME=$(echo ${{github.event.client_payload.new_repo_name}} | sed s/"tf-7ofWMvL9xWxxT8VsCQrU"//)
           TFVARS_FILE="repositories.auto.tfvars"
           
           if [[ ! -f "$TFVARS_FILE" ]]; then
@@ -31,7 +31,7 @@ jobs:
           fi
 
           # Check if entry already exists
-          if grep -q "\"$NEW_REPO_NAME\"" "$TFVARS_FILE""; then
+          if grep -q "\"$NEW_REPO_NAME\"" "$TFVARS_FILE"; then
               echo "'$NEW_REPO_NAME' already exists in list_repositories."
               exit 0
           fi
