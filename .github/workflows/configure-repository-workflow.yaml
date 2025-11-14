@@ -19,7 +19,7 @@ jobs:
       - name: Update Terraform repositories list
         run: |
           # Check if file exists
-          $TFVARS_FILE="repositories.auto.tfvars"
+          TFVARS_FILE="repositories.auto.tfvars"
           
           if [[ ! -f "$TFVARS_FILE" ]]; then
               echo "File $TFVARS_FILE not found!"
