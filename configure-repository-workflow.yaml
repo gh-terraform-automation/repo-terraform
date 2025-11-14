@@ -1,0 +1,42 @@
+name: Add and configure GitHub repository
+
+on:
+  workflow_call:
+    inputs:
+      NEW_REPO_NAME:
+        type: string
+        required: true
+    secrets:
+      GH_PRIVATE_TOKEN:
+        required: true
+
+jobs:
+  workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Update Terraform repositories list
+        run: |
+          # Check if file exists
+          $TFVARS_FILE="repositories.auto.tfvars"
+          
+          if [[ ! -f "$TFVARS_FILE" ]]; then
+              echo "File $TFVARS_FILE not found!"
+              exit 1
+          fi
+
+          # Check if entry already exists
+          if grep -q "\"$NEW_REPO_NAME\"" "$TFVARS_FILE""; then
+              echo "'$NEW_REPO_NAME' already exists in list_repositories."
+              exit 0
+          fi
+
+          # Insert new entry before the closing bracket
+          sed -i "/list_repositories\s*=\s*\[/,/]/ s/\]/    \"$NEW_REPO_NAME\",\n]/" "$TFVARS_FILE"
+
+          echo "Added '$NEW_REPO_NAME' to list_repositories."
+        
+      - name: Terraform plan
+        run: |
+          terraform plan
