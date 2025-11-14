@@ -39,4 +39,7 @@ jobs:
         
       - name: Terraform plan
         run: |
+          terraform init
+
+          TF_VAR_gh_private_token=${{secrets.GH_PRIVATE_TOKEN}}
           terraform plan
