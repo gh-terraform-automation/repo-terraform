@@ -18,6 +18,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
       - name: Update Terraform repositories list
         run: |
           # Check if file exists
