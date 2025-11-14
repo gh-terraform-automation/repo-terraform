@@ -48,4 +48,4 @@ jobs:
           terraform init
 
           TF_VAR_gh_private_token=${{secrets.GH_PRIVATE_TOKEN}}
-          terraform plan
+          terraform plan -input=false
