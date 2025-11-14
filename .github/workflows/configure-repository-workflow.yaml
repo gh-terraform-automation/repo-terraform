@@ -36,6 +36,7 @@ jobs:
           sed -i "/list_repositories\s*=\s*\[/,/]/ s/\]/    \"$NEW_REPO_NAME\",\n]/" "$TFVARS_FILE"
 
           echo "Added '$NEW_REPO_NAME' to list_repositories."
+          cat $TFVARS_FILE
         
       - name: Terraform plan
         run: |
