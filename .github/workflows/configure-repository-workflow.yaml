@@ -16,6 +16,11 @@ on:
 jobs:
   workflow:
     runs-on: ubuntu-latest
+
+    env:
+      TF_VAR_gh_private_token: ${{ secrets.GH_PRIVATE_TOKEN }}
+      GH_HOSTNAME: github.com
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -23,7 +28,7 @@ jobs:
       - name: Authenticate GitHub CLI
         run: |
           gh config set git_protocol ssh
-          echo "${{secrets.GH_PRIVATE_TOKEN}}" | gh auth login --hostname "gihtub.com" --with-token
+          echo "${{secrets.GH_PRIVATE_TOKEN}}" | gh auth login --hostname "$GH_HOSTNAME" --with-token
           if gh auth status >/dev/null 2>&1; then
             echo "Github CLI authenticated successfully"
           else
@@ -55,8 +60,6 @@ jobs:
           cat $TFVARS_FILE
         
       - name: Terraform plan
-        env:
-            TF_VAR_gh_private_token: ${{ secrets.GH_PRIVATE_TOKEN }}
         run: |
           terraform init
           # export TF_VAR_gh_private_token=${{ secrets.GH_PRIVATE_TOKEN }}
