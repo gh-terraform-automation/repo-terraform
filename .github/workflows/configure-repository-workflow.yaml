@@ -40,7 +40,7 @@ jobs:
           fi
       - name: Update Terraform repositories list
         run: |
-            ACTION_TYPE="${{ github.event.client_payload.type }}"
+            ACTION_TYPE="${{ github.event.action }}"
             NEW_REPO_NAME=$(echo "${{ github.event.client_payload.new_repo_name }}" | sed 's|.*/||')
             TFVARS_FILE="repositories.auto.tfvars"
         
