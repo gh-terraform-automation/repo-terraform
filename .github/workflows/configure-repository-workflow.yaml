@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
       - uses: hashicorp/setup-terraform@v3
       - name: Authenticate GitHub CLI
         run: |
@@ -64,3 +66,9 @@ jobs:
           terraform init
           # export TF_VAR_gh_private_token=${{ secrets.GH_PRIVATE_TOKEN }}
           terraform plan -input=false -no-color
+
+      - name: Commit new repo list and state
+        run: |
+          git add .
+          git commit -m "Adding repo ${{github.event.client_payload.new_repo_name}} to state."
+          git push
