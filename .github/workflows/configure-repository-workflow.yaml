@@ -24,8 +24,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
       - uses: hashicorp/setup-terraform@v3
       - name: Authenticate GitHub CLI
         run: |
@@ -69,6 +67,10 @@ jobs:
 
       - name: Commit new repo list and state
         run: |
+
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          
           git add .
           git commit -m "Adding repo ${{github.event.client_payload.new_repo_name}} to state."
           git push
