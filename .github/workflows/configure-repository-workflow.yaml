@@ -67,7 +67,7 @@ jobs:
         run: |
           terraform init
           # export TF_VAR_gh_private_token=${{ secrets.GH_PRIVATE_TOKEN }}
-          terraform plan -input=false -no-color
+          terraform apply -auto-approve
 
       - name: Commit new repo list and state
         run: |
