@@ -20,6 +20,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
+      - name: Authenticate GitHub CLI
+        run: |
+          gh config set git_protocol ssh
+          echo "${{secrets.GH_PRIVATE_TOKEN}}" | gh auth login --hostname "gihtub.com" --with-token
+          if gh auth status >/dev/null 2>&1; then
+            echo "Github CLI authenticated successfully"
+          else
+            echo "Github CLI authentication failed"
+            exit 1
+          fi
       - name: Update Terraform repositories list
         run: |
           # Check if file exists
