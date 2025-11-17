@@ -1,0 +1,13 @@
+
+name: Handle Repo Deletion
+
+on:
+  repository:
+    types: [deleted]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log deleted repo
+        run: echo "Repository ${{ github.event.repository.full_name }} was deleted"
