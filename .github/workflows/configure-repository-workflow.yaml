@@ -10,8 +10,7 @@ on:
   #     GH_PRIVATE_TOKEN:
   #       required: true
   repository_dispatch:
-    types:
-      - setup-repo
+    types: [setup-repo, delete-repo]
 
 permissions:
   id-token: write
@@ -41,28 +40,42 @@ jobs:
           fi
       - name: Update Terraform repositories list
         run: |
-          # Check if file exists
-          echo "${{github.event.client_payload.new_repo_name}}"
-          NEW_REPO_NAME=$(echo "${{ github.event.client_payload.new_repo_name }}" | sed 's|.*/||')
-          TFVARS_FILE="repositories.auto.tfvars"
-          
-          if [[ ! -f "$TFVARS_FILE" ]]; then
-              echo "File $TFVARS_FILE not found!"
-              exit 1
-          fi
-
-          # Check if entry already exists
-          if grep -q "\"$NEW_REPO_NAME\"" "$TFVARS_FILE"; then
-              echo "'$NEW_REPO_NAME' already exists in list_repositories."
-              exit 0
-          fi
-
-          # Insert new entry before the closing bracket
-          sed -i "/list_repositories\s*=\s*\[/,/]/ s/\]/    \"$NEW_REPO_NAME\",\n]/" "$TFVARS_FILE"
-
-          echo "Added '$NEW_REPO_NAME' to list_repositories."
-          cat $TFVARS_FILE
+            ACTION_TYPE="${{ github.event.client_payload.type }}"
+            NEW_REPO_NAME=$(echo "${{ github.event.client_payload.new_repo_name }}" | sed 's|.*/||')
+            TFVARS_FILE="repositories.auto.tfvars"
         
+            echo "Action type: $ACTION_TYPE"
+            echo "Repo name: $NEW_REPO_NAME"
+        
+            if [[ ! -f "$TFVARS_FILE" ]]; then
+                echo "File $TFVARS_FILE not found!"
+                exit 1
+            fi
+        
+            if [[ "$ACTION_TYPE" == "setup-repo" ]]; then
+                # Check if entry already exists
+                if grep -q "\"$NEW_REPO_NAME\"" "$TFVARS_FILE"; then
+                    echo "'$NEW_REPO_NAME' already exists in list_repositories."
+                    exit 0
+                fi
+        
+                # Insert new entry before the closing bracket
+                sed -i "/list_repositories\s*=\s*\[/,/]/ s/\]/    \"$NEW_REPO_NAME\",\n]/" "$TFVARS_FILE"
+                echo "Added '$NEW_REPO_NAME' to list_repositories."
+        
+            elif [[ "$ACTION_TYPE" == "delete-repo" ]]; then
+                # Remove the entry if it exists
+                if grep -q "\"$NEW_REPO_NAME\"" "$TFVARS_FILE"; then
+                    sed -i "/\"$NEW_REPO_NAME\"/d" "$TFVARS_FILE"
+                    echo "Removed '$NEW_REPO_NAME' from list_repositories."
+                else
+                    echo "'$NEW_REPO_NAME' not found in list_repositories."
+                fi
+            else
+                echo "Unknown action type: $ACTION_TYPE"
+                exit 1
+            fi
+
       - name: Terraform import and apply
         run: |
           terraform init
