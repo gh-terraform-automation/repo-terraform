@@ -72,8 +72,8 @@ jobs:
       - name: Commit new repo list and state
         run: |
 
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "SalonTom"
+          git config --global user.email "tom.salon62@gmail.com"
           
           git add .
           git commit -m "Adding repo ${{github.event.client_payload.new_repo_name}} to state."
