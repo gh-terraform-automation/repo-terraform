@@ -63,10 +63,13 @@ jobs:
           echo "Added '$NEW_REPO_NAME' to list_repositories."
           cat $TFVARS_FILE
         
-      - name: Terraform plan
+      - name: Terraform import and apply
         run: |
           terraform init
-          # export TF_VAR_gh_private_token=${{ secrets.GH_PRIVATE_TOKEN }}
+
+          NEW_REPO_NAME=$(echo "${{ github.event.client_payload.new_repo_name }}" | sed 's|.*/||')
+          terraform import github_repository.repository[\"$NEW_REPO_NAME\"] $NEW_REPO_NAME
+          
           terraform apply -auto-approve
 
       - name: Commit new repo list and state
