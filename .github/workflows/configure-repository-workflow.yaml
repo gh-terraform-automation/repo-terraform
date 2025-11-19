@@ -9,12 +9,16 @@ on:
   #   secrets:
   #     GH_PRIVATE_TOKEN:
   #       required: true
-  repository_dispatch:
-    types: [setup-repo, delete-repo]
+
+  # repository_dispatch:
+  #   types: [setup-repo, delete-repo]
+  schedule:
+    - cron: "5 * * * *" # Run every five minutes
 
 permissions:
   id-token: write
-  contents: write
+  # contents: write
+  contents: read
 
 jobs:
   workflow:
@@ -28,69 +32,79 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
-      - name: Authenticate GitHub CLI
-        run: |
-          gh config set git_protocol ssh
-          echo "${{secrets.GH_PRIVATE_TOKEN}}" | gh auth login --hostname "$GH_HOSTNAME" --with-token
-          if gh auth status >/dev/null 2>&1; then
-            echo "Github CLI authenticated successfully"
-          else
-            echo "Github CLI authentication failed"
-            exit 1
-          fi
-      - name: Update Terraform repositories list
-        run: |
-            ACTION_TYPE="${{ github.event.action }}"
-            NEW_REPO_NAME=$(echo "${{ github.event.client_payload.new_repo_name }}" | sed 's|.*/||')
-            TFVARS_FILE="repositories.auto.tfvars"
+      
+      # - name: Authenticate GitHub CLI
+      #   run: |
+      #     gh config set git_protocol ssh
+      #     echo "${{secrets.GH_PRIVATE_TOKEN}}" | gh auth login --hostname "$GH_HOSTNAME" --with-token
+      #     if gh auth status >/dev/null 2>&1; then
+      #       echo "Github CLI authenticated successfully"
+      #     else
+      #       echo "Github CLI authentication failed"
+      #       exit 1
+      #     fi
+      # - name: Update Terraform repositories list
+      #   run: |
+      #       ACTION_TYPE="${{ github.event.action }}"
+      #       NEW_REPO_NAME=$(echo "${{ github.event.client_payload.new_repo_name }}" | sed 's|.*/||')
+      #       TFVARS_FILE="repositories.auto.tfvars"
         
-            echo "Action type: $ACTION_TYPE"
-            echo "Repo name: $NEW_REPO_NAME"
+      #       echo "Action type: $ACTION_TYPE"
+      #       echo "Repo name: $NEW_REPO_NAME"
         
-            if [[ ! -f "$TFVARS_FILE" ]]; then
-                echo "File $TFVARS_FILE not found!"
-                exit 1
-            fi
+      #       if [[ ! -f "$TFVARS_FILE" ]]; then
+      #           echo "File $TFVARS_FILE not found!"
+      #           exit 1
+      #       fi
         
-            if [[ "$ACTION_TYPE" == "setup-repo" ]]; then
-                # Check if entry already exists
-                if grep -q "\"$NEW_REPO_NAME\"" "$TFVARS_FILE"; then
-                    echo "'$NEW_REPO_NAME' already exists in list_repositories."
-                    exit 0
-                fi
+      #       if [[ "$ACTION_TYPE" == "setup-repo" ]]; then
+      #           # Check if entry already exists
+      #           if grep -q "\"$NEW_REPO_NAME\"" "$TFVARS_FILE"; then
+      #               echo "'$NEW_REPO_NAME' already exists in list_repositories."
+      #               exit 0
+      #           fi
         
-                # Insert new entry before the closing bracket
-                sed -i "/list_repositories\s*=\s*\[/,/]/ s/\]/    \"$NEW_REPO_NAME\",\n]/" "$TFVARS_FILE"
-                echo "Added '$NEW_REPO_NAME' to list_repositories."
+      #           # Insert new entry before the closing bracket
+      #           sed -i "/list_repositories\s*=\s*\[/,/]/ s/\]/    \"$NEW_REPO_NAME\",\n]/" "$TFVARS_FILE"
+      #           echo "Added '$NEW_REPO_NAME' to list_repositories."
         
-            elif [[ "$ACTION_TYPE" == "delete-repo" ]]; then
-                # Remove the entry if it exists
-                if grep -q "\"$NEW_REPO_NAME\"" "$TFVARS_FILE"; then
-                    sed -i "/\"$NEW_REPO_NAME\"/d" "$TFVARS_FILE"
-                    echo "Removed '$NEW_REPO_NAME' from list_repositories."
-                else
-                    echo "'$NEW_REPO_NAME' not found in list_repositories."
-                fi
-            else
-                echo "Unknown action type: $ACTION_TYPE"
-                exit 1
-            fi
+      #       elif [[ "$ACTION_TYPE" == "delete-repo" ]]; then
+      #           # Remove the entry if it exists
+      #           if grep -q "\"$NEW_REPO_NAME\"" "$TFVARS_FILE"; then
+      #               sed -i "/\"$NEW_REPO_NAME\"/d" "$TFVARS_FILE"
+      #               echo "Removed '$NEW_REPO_NAME' from list_repositories."
+      #           else
+      #               echo "'$NEW_REPO_NAME' not found in list_repositories."
+      #           fi
+      #       else
+      #           echo "Unknown action type: $ACTION_TYPE"
+      #           exit 1
+      #       fi
 
       - name: Terraform import and apply
         run: |
           terraform init
 
-          NEW_REPO_NAME=$(echo "${{ github.event.client_payload.new_repo_name }}" | sed 's|.*/||')
-          terraform import github_repository.repository[\"$NEW_REPO_NAME\"] $NEW_REPO_NAME
-          
-          terraform apply -auto-approve
+          # NEW_REPO_NAME=$(echo "${{ github.event.client_payload.new_repo_name }}" | sed 's|.*/||')
+          # terraform import github_repository.repository[\"$NEW_REPO_NAME\"] $NEW_REPO_NAME
 
-      - name: Commit new repo list and state
+          # terraform apply -auto-approve
+          terraform plan
+
+      # - name: Commit new repo list and state
+      #   run: |
+
+      #     git config --global user.name "SalonTom"
+      #     git config --global user.email "tom.salon62@gmail.com"
+          
+      #     git add .
+      #     git commit -m "Adding repo ${{github.event.client_payload.new_repo_name}} to state."
+      #     git push
+
+      - name: Trigger bis-kube-tf-bootstrap
         run: |
-
-          git config --global user.name "SalonTom"
-          git config --global user.email "tom.salon62@gmail.com"
-          
-          git add .
-          git commit -m "Adding repo ${{github.event.client_payload.new_repo_name}} to state."
-          git push
+          echo "Triggering bis-kube-tf-bootstrap workflow."
+        
+      - name: Trigger appli-oci
+        run: |
+          echo "Triggering appli-oci workflow."

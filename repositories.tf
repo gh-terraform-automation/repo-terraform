@@ -1,11 +1,19 @@
 resource "github_repository" "repository" {
 
-  for_each = var.list_repositories
+  for_each = toset(data.github_repositories.list_repositories.names)
 
   name        = each.value
-  description = "Repository created using Terraform."
+  description = "A standard project"
 
-  visibility = "private"
+  visibility         = "private"
+  topics             = ["standard", "common"]
+  archive_on_destroy = true
+
+  allow_update_branch = true
+
+  allow_merge_commit = false
+  allow_squash_merge = false
+  allow_rebase_merge = true
 
   template {
     owner                = var.github_org
