@@ -91,15 +91,15 @@ jobs:
           terraform apply -auto-approve
           # terraform plan
 
-      # - name: Commit new repo list and state
-      #   run: |
+      - name: Commit new state
+        run: |
 
-      #     git config --global user.name "SalonTom"
-      #     git config --global user.email "tom.salon62@gmail.com"
+          git config --global user.name "SalonTom"
+          git config --global user.email "tom.salon62@gmail.com"
           
-      #     git add .
-      #     git commit -m "Adding repo ${{github.event.client_payload.new_repo_name}} to state."
-      #     git push
+          git add .
+          git commit -m "Adding new repos to state."
+          git push
 
       - name: Trigger bis-kube-tf-bootstrap
         run: |
