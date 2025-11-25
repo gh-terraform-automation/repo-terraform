@@ -19,8 +19,8 @@ on:
 
 permissions:
   id-token: write
-  # contents: write
-  contents: read
+  contents: write # Only for testing purposes
+  # contents: read
 
 jobs:
   workflow:
@@ -29,6 +29,7 @@ jobs:
     env:
       TF_VAR_gh_private_token: ${{ secrets.GH_PRIVATE_TOKEN }}
       GH_HOSTNAME: github.com
+      GH_TOKEN: ${{ secrets.GH_PRIVATE_TOKEN }}
 
     steps:
       - name: Checkout Repository
@@ -84,8 +85,6 @@ jobs:
       #       fi
 
       - name: Configure repositories
-        env:
-          GH_TOKEN: ${{ secrets.GH_PRIVATE_TOKEN }}
         run: |
           terraform init
 
