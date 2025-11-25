@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      GH_TOKEN: ${{ secrets.GH_PRIVATE_TOKEN }}
       TF_VAR_gh_private_token: ${{ secrets.GH_PRIVATE_TOKEN }}
       GH_HOSTNAME: github.com
 
