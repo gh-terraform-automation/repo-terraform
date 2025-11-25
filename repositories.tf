@@ -6,7 +6,7 @@ resource "github_repository" "repository" {
   description = "A standard project"
 
   visibility         = "private"
-  topics             = ["standard", "common"]
+  # topics             = ["common", "dev", "rec"]
   archive_on_destroy = true
 
   allow_update_branch = true
@@ -19,5 +19,9 @@ resource "github_repository" "repository" {
     owner                = var.github_org
     repository           = "repo-template"
     include_all_branches = false
+  }
+
+  lifecycle {
+    ignore_changes = [ topics ]
   }
 }
