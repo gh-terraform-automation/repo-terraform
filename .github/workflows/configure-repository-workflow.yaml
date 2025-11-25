@@ -103,8 +103,8 @@ jobs:
           terraform apply -auto-approve
 
       - name: Commit new state
+        if: env.NEW_APPS_TO_CONFIGURE == 'true'
         run: |
-
           git config --global user.name "SalonTom"
           git config --global user.email "tom.salon62@gmail.com"
           
