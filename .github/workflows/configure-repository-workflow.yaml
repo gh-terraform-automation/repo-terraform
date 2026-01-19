@@ -113,13 +113,3 @@ jobs:
           git add .
           git commit -m "Adding new repos to state."
           git push
-
-      - name: Trigger bis-kube-tf-bootstrap
-        if: env.NEW_APPS_TO_CONFIGURE == 'true'
-        run: |
-          echo "Triggering bis-kube-tf-bootstrap workflow."
-        
-      - name: Trigger appli-oci
-        if: env.NEW_APPS_TO_CONFIGURE == 'true'
-        run: |
-          echo "Triggering appli-oci workflow."
