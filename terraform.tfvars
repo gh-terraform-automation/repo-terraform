@@ -1,1 +1,1 @@
-github_org = "github-terraform-automation"
+github_org = "gh-terraform-automation"
