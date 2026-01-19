@@ -1,8 +1,3 @@
-variable "list_repositories" {
-  type        = set(string)
-  description = "List of repositories to create."
-}
-
 variable "github_org" {
   type = string
   description = "GitHub Organization"
