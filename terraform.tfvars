@@ -1,1 +1,1 @@
-github_org = "tf-7ofWMvL9xWxxT8VsCQrU"
+github_org = "github-terraform-automation"
